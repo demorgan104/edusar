@@ -8,7 +8,7 @@ edusar is an educational, AUTOSAR-inspired C99 project with a configuration
 generator, a command-line demo, and an interactive two-ECU visualizer. Everything
 runs locally, without CAN hardware or third-party packages.
 
-![Signal journey: VehicleSpeed travels down ECU 1 through COM, PduR and CanIf, across simulated CAN, and up ECU 2 to the receiving application.](PduR/docs/images/signal-journey.svg)
+![Signal journey: VehicleSpeed travels down ECU 1 through COM, PduR and CanIf, across simulated CAN, and up ECU 2 to the receiving application.](docs/images/signal-journey.svg)
 
 ## Try it
 
@@ -18,7 +18,7 @@ from the repository root.
 Start the visual demo:
 
 ```sh
-make -C PduR/build ui
+make -C build ui
 ```
 
 Open **http://127.0.0.1:8000**, enter a VehicleSpeed value from `0` to `65535`, and
@@ -30,13 +30,13 @@ value, and the transmit confirmation count.
 Stop the server with **Ctrl+C**. To use a different port:
 
 ```sh
-make -C PduR/build ui PORT=8080
+make -C build ui PORT=8080
 ```
 
 Prefer the terminal? Run:
 
 ```sh
-make -C PduR/build demo
+make -C build demo
 ```
 
 ```text
@@ -74,14 +74,14 @@ simulated driver completed its synchronous send, rather than a hardware CAN ACK.
 
 ## Configure the stack
 
-Edit [PduR/config/demo.json](PduR/config/demo.json) to define signal IDs, COM and
+Edit [config/demo.json](config/demo.json) to define signal IDs, COM and
 CanIf PDU IDs, and CAN identifiers. Every build runs the Python generator to
 produce the configuration tables for all three modules in
-[PduR_PBcfg.c](PduR/PduR/src/PduR_PBcfg.c).
+[PduR_PBcfg.c](modules/PduR/src/PduR_PBcfg.c).
 
 ```sh
-make -C PduR/build generate  # regenerate configuration only
-make -C PduR/build          # generate and compile
+make -C build generate  # regenerate configuration only
+make -C build          # generate and compile
 ```
 
 The supported profile has **1–16 unsigned 16-bit signals**, with one signal per
@@ -89,32 +89,60 @@ two-byte PDU and standard 11-bit CAN identifiers. The demo, UI labels, and stack
 tests use the default IDs; update them when changing those IDs. Edit the JSON
 source rather than the generated C tables.
 
-## Find your way around
+## Project layout
+
+The communication modules live in `modules/`. The demo, tests, and build tools
+are separate folders at the repository root.
+
+```text
+edusar/
+├── modules/
+│   ├── Com/          # signal encoding and decoding
+│   ├── PduR/         # PDU routing
+│   ├── CanIf/        # CAN interface
+│   └── Common/       # shared C types
+├── demo/
+│   ├── main.c        # two-ECU C demo
+│   ├── serve.py      # local HTTP server and C bridge
+│   └── ui/           # browser visualization
+├── tests/            # C, generator, and HTTP integration checks
+├── config/           # JSON configuration
+├── tools/            # configuration generator
+├── build/            # Makefile, config.mk, and generated build outputs
+└── docs/             # stack documentation and illustrations
+```
 
 | Path | Contents |
 | --- | --- |
-| [PduR/Com](PduR/Com) | Signal packing, decoding, and receive storage |
-| [PduR/PduR](PduR/PduR) | PDU routing and generated configuration tables |
-| [PduR/CanIf](PduR/CanIf) | CAN identifier mapping and receive filtering |
-| [PduR/demo](PduR/demo) | C demo, local Python server, and browser UI |
-| [PduR/config](PduR/config) / [PduR/tools](PduR/tools) | JSON configuration and generator |
-| [PduR/tests](PduR/tests) | Stack, generator, and UI integration checks |
-| [PduR/build](PduR/build) | Makefile and compiler settings |
+| [modules/Com](modules/Com) | Signal packing, decoding, and receive storage |
+| [modules/PduR](modules/PduR) | PDU routing and generated configuration tables |
+| [modules/CanIf](modules/CanIf) | CAN identifier mapping and receive filtering |
+| [modules/Common](modules/Common) | Shared types used by the communication modules |
+| [demo](demo) | C demo, local Python server, and browser UI |
+| [config](config) / [tools](tools) | JSON configuration and generator |
+| [tests](tests) | Stack, generator, and UI integration checks |
+| [build](build) | Makefile and compiler settings |
+| [docs](docs) | Detailed stack documentation and illustrations |
 
 ## Build and check
 
 ```sh
-make -C PduR/build test       # C stack and Python generator checks
-python3 PduR/tests/test_ui.py # HTTP/C bridge checks; run after building the demo
-make -C PduR/build clean      # remove build outputs
+make -C build            # build the demo before running HTTP checks
+make -C build test       # C stack and Python generator checks
+python3 tests/test_ui.py # HTTP/C bridge checks; run after building the demo
+make -C build clean      # remove build outputs
 ```
+
+The compiled demo is `build/out/bin/demo`; object files and test executables
+also live under `build/out/`. Compiler settings are in
+[build/config.mk](build/config.mk).
 
 The checks cover signal encoding, routing, confirmations, invalid inputs,
 reinitialization, configuration validation, and HTTP integration. The UI check
 starts a temporary localhost server. The default C build treats compiler
 warnings as errors.
 
-See the [stack documentation](PduR/docs/README.md) for API behavior, configuration
+See the [stack documentation](docs/README.md) for API behavior, configuration
 details, and implementation limits.
 
 ## Scope
