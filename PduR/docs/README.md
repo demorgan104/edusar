@@ -4,6 +4,10 @@ A host-runnable C99 implementation of a small AUTOSAR-inspired communication
 profile. Requires a C99 compiler, GNU Make, and Python 3 (standard library only).
 No hardware, packages, or network connection are needed.
 
+![Signal flow through two ECU stacks and simulated CAN.](images/signal-journey.svg)
+
+For a guided introduction and quick start, see the [project README](../../README.md).
+
 From the repository root:
 
 ```sh
