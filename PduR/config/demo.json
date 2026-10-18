@@ -1,6 +1,0 @@
-{
-  "signals": [
-    {"name": "VehicleSpeed", "signal_id": 0, "com_tx": 10, "com_rx": 11,
-     "canif_tx": 20, "canif_rx": 21, "can_id": 291}
-  ]
-}
