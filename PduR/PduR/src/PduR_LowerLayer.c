@@ -1,1 +1,2 @@
-// PduR/src/PduR_LowerLayer.c - Source code placeholder
+/* Routing implementation is centralized in PduR.c. */
+#include "PduR.h"

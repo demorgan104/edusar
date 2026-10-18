@@ -1,1 +1,4 @@
-// PduR/include/PduR_CanIf.h - Header file placeholder
+#ifndef PDUR_CANIF_H
+#define PDUR_CANIF_H
+#include "PduR.h"
+#endif

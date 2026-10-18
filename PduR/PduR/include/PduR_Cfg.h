@@ -1,1 +1,4 @@
-// PduR/include/PduR_Cfg.h - Header file placeholder
+#ifndef PDUR_CFG_H
+#define PDUR_CFG_H
+#include "PduR.h"
+#endif
